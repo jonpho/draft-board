@@ -214,6 +214,7 @@ body {
 .players-table td {
   padding: 15px;
   font-size: 14px;
+  color: #333;
 }
 
 .player-name {
