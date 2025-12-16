@@ -426,6 +426,130 @@ describe('App', () => {
     })
   })
 
+  describe('Column Cell Values', () => {
+    beforeEach(() => {
+      global.fetch.mockResolvedValue({
+        json: () => Promise.resolve(mockPlayers),
+      })
+    })
+
+    it('displays Position values in correct table cells', async () => {
+      render(<App />)
+
+      await waitFor(() => {
+        const rows = screen.getAllByRole('row')
+        // Find Patrick Mahomes row (should be row 2, since row 1 is headers)
+        const mahomesRow = rows.find(row => row.textContent.includes('Patrick Mahomes'))
+        expect(mahomesRow).toBeDefined()
+
+        const cells = within(mahomesRow).getAllByRole('cell')
+        // Position should be in the 2nd cell (index 1)
+        expect(cells[1]).toHaveTextContent('QB')
+
+        // Find Christian McCaffrey row
+        const mccaffreyRow = rows.find(row => row.textContent.includes('Christian McCaffrey'))
+        expect(mccaffreyRow).toBeDefined()
+
+        const mccaffreyCells = within(mccaffreyRow).getAllByRole('cell')
+        expect(mccaffreyCells[1]).toHaveTextContent('RB')
+
+        // Find Tyreek Hill row
+        const hillRow = rows.find(row => row.textContent.includes('Tyreek Hill'))
+        expect(hillRow).toBeDefined()
+
+        const hillCells = within(hillRow).getAllByRole('cell')
+        expect(hillCells[1]).toHaveTextContent('WR')
+      })
+    })
+
+    it('displays Team values in correct table cells', async () => {
+      render(<App />)
+
+      await waitFor(() => {
+        const rows = screen.getAllByRole('row')
+
+        // Find Patrick Mahomes row
+        const mahomesRow = rows.find(row => row.textContent.includes('Patrick Mahomes'))
+        const mahomesCells = within(mahomesRow).getAllByRole('cell')
+        // Team should be in the 3rd cell (index 2)
+        expect(mahomesCells[2]).toHaveTextContent('KC')
+
+        // Find Christian McCaffrey row
+        const mccaffreyRow = rows.find(row => row.textContent.includes('Christian McCaffrey'))
+        const mccaffreyCells = within(mccaffreyRow).getAllByRole('cell')
+        expect(mccaffreyCells[2]).toHaveTextContent('SF')
+
+        // Find Tyreek Hill row
+        const hillRow = rows.find(row => row.textContent.includes('Tyreek Hill'))
+        const hillCells = within(hillRow).getAllByRole('cell')
+        expect(hillCells[2]).toHaveTextContent('MIA')
+      })
+    })
+
+    it('displays Projected Points values in correct table cells', async () => {
+      render(<App />)
+
+      await waitFor(() => {
+        const rows = screen.getAllByRole('row')
+
+        // Find Patrick Mahomes row
+        const mahomesRow = rows.find(row => row.textContent.includes('Patrick Mahomes'))
+        const mahomesCells = within(mahomesRow).getAllByRole('cell')
+        // Projected Points should be in the 4th cell (index 3)
+        expect(mahomesCells[3]).toHaveTextContent('350.5')
+
+        // Find Christian McCaffrey row
+        const mccaffreyRow = rows.find(row => row.textContent.includes('Christian McCaffrey'))
+        const mccaffreyCells = within(mccaffreyRow).getAllByRole('cell')
+        expect(mccaffreyCells[3]).toHaveTextContent('320.0')
+
+        // Find Tyreek Hill row
+        const hillRow = rows.find(row => row.textContent.includes('Tyreek Hill'))
+        const hillCells = within(hillRow).getAllByRole('cell')
+        expect(hillCells[3]).toHaveTextContent('280.0')
+      })
+    })
+
+    it('displays all three columns together correctly for each player', async () => {
+      render(<App />)
+
+      await waitFor(() => {
+        const rows = screen.getAllByRole('row')
+
+        // Test all columns for Patrick Mahomes
+        const mahomesRow = rows.find(row => row.textContent.includes('Patrick Mahomes'))
+        const mahomesCells = within(mahomesRow).getAllByRole('cell')
+        expect(mahomesCells[0]).toHaveTextContent('Patrick Mahomes') // Name
+        expect(mahomesCells[1]).toHaveTextContent('QB') // Position
+        expect(mahomesCells[2]).toHaveTextContent('KC') // Team
+        expect(mahomesCells[3]).toHaveTextContent('350.5') // Projected Points
+      })
+    })
+
+    it('ensures Position, Team, and Projected Points cells have visible text color', async () => {
+      render(<App />)
+
+      await waitFor(() => {
+        const rows = screen.getAllByRole('row')
+        const mahomesRow = rows.find(row => row.textContent.includes('Patrick Mahomes'))
+
+        if (mahomesRow) {
+          const cells = within(mahomesRow).getAllByRole('cell')
+
+          // Check that cells 1, 2, 3 (Position, Team, Projected Points) have content
+          expect(cells[1].textContent).toBeTruthy() // Position
+          expect(cells[2].textContent).toBeTruthy() // Team
+          expect(cells[3].textContent).toBeTruthy() // Projected Points
+
+          // Verify they're not empty or just whitespace
+          expect(cells[1].textContent.trim()).not.toBe('')
+          expect(cells[2].textContent.trim()).not.toBe('')
+          expect(cells[3].textContent.trim()).not.toBe('')
+        }
+      })
+    })
+  })
+
   describe('Error Handling', () => {
     it('handles fetch error gracefully', async () => {
       const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
